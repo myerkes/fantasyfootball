@@ -8,11 +8,43 @@ from bs4 import BeautifulSoup
 
 # Import data manipulation modules
 import pandas as pd
+import sqlite3
 
-# URL of page
-base_url = 'https://www.pro-football-reference.com/years/2022/{0}.htm'
+def create_database():
+    # create a new database and open a connection to it
+    db_conn = sqlite3.connect('test_database') 
 
-stat_categories = ['passing', 'rushing', 'receiving', 'kicking']
+    # create a database cursor in order to execute SQL statements and fetch results from SQL queries
+    c = db_conn.cursor()
 
-for stat_category in stat_categories:
-    print(base_url.format(stat_category))
+    # Example create table in database
+    # data type is optional
+    # cur.execute("CREATE TABLE movie(title, year, score)")
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS stat_cat({})
+        '''.format(stat_categories))
+
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS products
+            ([product_id] INTEGER PRIMARY KEY, [product_name] TEXT)
+            ''')
+            
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS prices
+            ([product_id] INTEGER PRIMARY KEY, [price] INTEGER)
+            ''')
+                        
+    db_conn.commit()
+
+    a = db_conn.execute('SELECT * FROM stat_cat')
+
+    names = [description[0] for description in a.description]
+    print(names)
+
+    return db_conn
+
+
+
+
+a = create_database()

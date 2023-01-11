@@ -19,6 +19,10 @@ Player stats scraping tool found [here](https://github.com/zackthoutt/nfl-player
 
 Test of how to rank players
 
+### [save_player_stats.py](player_stats.py)
+
+Scrape player stats and save them to a database
+
 ### [test.py](test.py)
 
 Test file

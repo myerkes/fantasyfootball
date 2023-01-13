@@ -49,7 +49,7 @@ def scrape_stats(year=2022, category=""):
 
     # Collect table headers
     # receiving and kicking have extra table header row
-    if stat_category == 'passing' or stat_category == 'receiving':
+    if category == 'passing' or category == 'receiving':
         column_headers = stats_page.findAll('tr')[0]
         # Collect table rows
         rows = stats_page.findAll('tr')[1:]
@@ -65,11 +65,12 @@ def scrape_stats(year=2022, category=""):
     for i in range(len(rows)):
         stats.append([col.getText() for col in rows[i].findAll('td')])
         
+    print(column_headers[1:])
     # Create DataFrame from our scraped data and remove rank column
     data = pd.DataFrame(stats, columns=column_headers[1:])
 
     # remove duplicate column name
-    if stat_category == "passing":
+    if category == "passing":
         # Rename sack yards column to `Yds_Sack`
         new_columns = data.columns.values
         new_columns[-6] = 'Yds_Sack'
@@ -94,11 +95,11 @@ def scrape_stats(year=2022, category=""):
 
     return num_data
 
-
+'''
 for stat_category in STAT_COL:
 
     a = scrape_stats(2022, stat_category)
-    '''
+
     html = urlopen(BASE_URL.format(stat_category))
     
 
@@ -128,13 +129,6 @@ for stat_category in STAT_COL:
     data = pd.DataFrame(stats, columns=column_headers[1:])
 
     print(data.head())
-
-    '''
-
-
-
-        
-    '''
 
     # Collect table rows
     rows = stats_page.findAll('tr')[1:]

@@ -3,9 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
-df = pd.read_csv('https://raw.githubusercontent.com/fantasydatapros/LearnPythonWithFantasyFootball/master/2022/06-Data%20Munging/01-Fantasy%20Pros%20Projections%20-%20(2022.08.25).csv')
-
+from save_player_stats import *
 
 sns.set_style('whitegrid')
 
@@ -27,13 +25,14 @@ scoring_weights = {
     'int': -2
 }
 
-df['FantasyPoints'] = (
-    df['Receptions']*scoring_weights['receptions'] + df['ReceivingYds']*scoring_weights['receiving_yds'] + \
-    df['ReceivingTD']*scoring_weights['receiving_td'] + df['FL']*scoring_weights['FL'] + \
-    df['RushingYds']*scoring_weights['rushing_yds'] + df['RushingTD']*scoring_weights['rushing_td'] + \
-    df['PassingYds']*scoring_weights['passing_yds'] + df['PassingTD']*scoring_weights['passing_td'] + \
-    df['Int']*scoring_weights['int'] 
-)
+rushing = scrape_stats(2022, 'rushing')
+receiving = scrape_stats(2022, 'receiving')
+rush_rec = pd.merge(rushing, receiving, on=['Player','Tm', 'Age', 'Pos', 'G', 'GS', 'Fmb'], suffixes=["_rush","_rec"])
+print(rush_rec.columns)
+
+quit()
+
+stats_db = create_database("rush_rec_stats")
 
 base_columns = ['Player', 'Team', 'Pos']
 rushing_columns = ['FantasyPoints', 'Receptions', 'ReceivingYds', 'ReceivingTD', 'RushingAtt', 'RushingYds', 'RushingTD', 'FL']

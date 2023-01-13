@@ -17,7 +17,7 @@ STAT_COL = ['passing', 'rushing', 'receiving']
 
 def create_database(table_name="",columns=[]):
     # create a new database and open a connection to it
-    db_conn = sqlite3.connect('test_database3') 
+    db_conn = sqlite3.connect('test_database4') 
 
     # create a database cursor in order to execute SQL statements and fetch results from SQL queries
     c = db_conn.cursor()
@@ -91,9 +91,8 @@ def scrape_stats(year=2022, category=""):
 
     num_data = data
     num_data[numeric_col] = num_data[numeric_col].apply(pd.to_numeric)
-    print(num_data.head())
 
-    return ""
+    return num_data
 
 
 for stat_category in STAT_COL:

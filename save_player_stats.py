@@ -11,7 +11,7 @@ import pandas as pd
 import sqlite3
 
 # URL of page
-BASE_URL = 'https://www.pro-football-reference.com/years/2022/{0}.htm'
+BASE_URL = 'https://www.pro-football-reference.com/years/{0}/{1}.htm'
 #STAT_COL = ['passing', 'rushing', 'receiving', 'kicking']
 STAT_COL = ['passing', 'rushing', 'receiving']
 
@@ -39,9 +39,10 @@ def create_database(table_name="",columns=[]):
 
     return db_conn
 
-def scrape_stats(url=""):
+def scrape_stats(year=2022, category=""):
 
     # Open URL and pass to BeautifulSoup
+    url = BASE_URL.format(year, category)
     html = urlopen(url)
 
     stats_page = BeautifulSoup(html, features="html.parser")
@@ -67,6 +68,7 @@ def scrape_stats(url=""):
     # Create DataFrame from our scraped data and remove rank column
     data = pd.DataFrame(stats, columns=column_headers[1:])
 
+    # remove duplicate column name
     if stat_category == "passing":
         # Rename sack yards column to `Yds_Sack`
         new_columns = data.columns.values
@@ -96,7 +98,7 @@ def scrape_stats(url=""):
 
 for stat_category in STAT_COL:
 
-    a = scrape_stats(BASE_URL.format(stat_category))
+    a = scrape_stats(2022, stat_category)
     '''
     html = urlopen(BASE_URL.format(stat_category))
     

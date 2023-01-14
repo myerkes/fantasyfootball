@@ -27,9 +27,9 @@ def main():
         'int': -2
     }
 
-    rushing = scrape_stats([2021, 2022], 'rushing')
-    receiving = scrape_stats([2021, 2022], 'receiving')
-    passing = scrape_stats([2021, 2022], 'passing')
+    rushing = scrape_stats([2019, 2020, 2021, 2022], 'rushing')
+    receiving = scrape_stats([2019, 2020, 2021, 2022], 'receiving')
+    passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
     rush_rec = pd.merge(rushing, receiving, on=['Player','Tm', 'Age', 'Pos', 'G', 'GS', 'Fmb'], suffixes=["_rush","_rec"], how="outer")
 
     rush_rec['FantasyPoints'] = (
@@ -41,23 +41,23 @@ def main():
         rush_rec['Fmb']*scoring_weights['FL']
     )
     rush_rec['PPG'] = rush_rec['FantasyPoints']/rush_rec['G']
-    rush_rec['PPG_Rank'] = rush_rec['PPG'].rank(ascending=False)
-    rush_rec['Pos_PPG_Rank'] = rush_rec.groupby('Pos')['PPG'].rank(ascending=False)
+    rush_rec['Year_PPG_Rank'] = rush_rec.groupby('Year_rush')['PPG'].rank(ascending=False)
+    rush_rec['Pos_PPG_Rank'] = rush_rec.groupby(['Year_rush','Pos'])['PPG'].rank(ascending=False)
 
     te = rush_rec.loc[rush_rec['Pos']=='TE']
     rb = rush_rec.loc[rush_rec['Pos']=='RB']
     wr = rush_rec.loc[rush_rec['Pos']=='WR']
 
-    print(rush_rec.sort_values(by="PPG_Rank", ascending=True).head(15))
+    #print(rush_rec.sort_values(by="PPG_Rank", ascending=True).head(15))
 
     sns.lineplot(
-        data = rush_rec,
-        x = "PPG_Rank",
+        data = rb,
+        x = "Year_PPG_Rank",
         y = "PPG",
-        hue='Pos'
+        hue='Year_rush'
     )
 
-    #plt.show()
+    plt.show()
 
     quit()
 

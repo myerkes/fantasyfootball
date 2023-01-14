@@ -39,10 +39,11 @@ def create_database(table_name="",columns=[]):
 
     return db_conn
 
-def scrape_stats(year=2022, category=""):
+def scrape_stats(years=[2022], category=""):
 
+    # Create table using first year
     # Open URL and pass to BeautifulSoup
-    url = BASE_URL.format(year, category)
+    url = BASE_URL.format(years[0], category)
     html = urlopen(url)
 
     stats_page = BeautifulSoup(html, features="html.parser")
@@ -51,28 +52,49 @@ def scrape_stats(year=2022, category=""):
     # receiving and kicking have extra table header row
     if category == 'passing' or category == 'receiving':
         column_headers = stats_page.findAll('tr')[0]
-        # Collect table rows
-        rows = stats_page.findAll('tr')[1:]
     else:
         column_headers = stats_page.findAll('tr')[1]
-        # Collect table rows
-        rows = stats_page.findAll('tr')[2:]
 
     column_headers = [i.getText() for i in column_headers.findAll('th')]
+    column_headers.append('Year')
 
-    # Get stats from each row
-    stats = []
-    for i in range(len(rows)):
-        stats.append([col.getText() for col in rows[i].findAll('td')])
-        
-    # Create DataFrame from our scraped data and remove rank column
-    data = pd.DataFrame(stats, columns=column_headers[1:])
+    for y, year in enumerate(years):
+        # Open URL and pass to BeautifulSoup
+        url = BASE_URL.format(year, category)
+        html = urlopen(url)
+
+        stats_page = BeautifulSoup(html, features="html.parser")
+
+        # receiving and kicking have extra table header row
+        if category == 'passing' or category == 'receiving':
+            # Collect table rows
+            rows = stats_page.findAll('tr')[1:]
+        else:
+            # Collect table rows
+            rows = stats_page.findAll('tr')[2:]
+
+        # Get stats from each row
+        stats = []
+        for i in range(len(rows)):
+            new_stat = [col.getText() for col in rows[i].findAll('td')]
+            new_stat.append(year)
+            stats.append(new_stat)
+            
+        if y == 0:
+            # Create DataFrame from our scraped data and remove rank column
+            data = pd.DataFrame(stats, columns=column_headers[1:])
+        else:
+            # Append to dataframe
+            # TODO - swap to concat instead of append which is depreciated
+            temp = pd.DataFrame(stats, columns=column_headers[1:])
+            data = data.append(temp, ignore_index=True)
 
     # remove duplicate column name
     if category == "passing":
         # Rename sack yards column to `Yds_Sack`
         new_columns = data.columns.values
-        new_columns[-6] = 'Yds_Sack'
+        # TODO - replace hard coded value with lookup to position of Yds_Sack column
+        new_columns[-7] = 'Yds_Sack'
         data.columns = new_columns
 
     # Remove ornamental characters for achievements
@@ -92,6 +114,7 @@ def scrape_stats(year=2022, category=""):
     num_data = data
     num_data[numeric_col] = num_data[numeric_col].apply(pd.to_numeric)
 
+        
     return num_data
 
 def main():

@@ -87,7 +87,7 @@ def scrape_stats(years=[2022], category=""):
             # Append to dataframe
             # TODO - swap to concat instead of append which is depreciated
             temp = pd.DataFrame(stats, columns=column_headers[1:])
-            data = data.append(temp, ignore_index=True)
+            data = pd.concat([data, temp], ignore_index=True)
 
     # remove duplicate column name
     if category == "passing":

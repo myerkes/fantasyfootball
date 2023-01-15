@@ -27,9 +27,9 @@ def main():
         'int': -2
     }
 
-    rushing = scrape_stats([2019, 2020, 2021, 2022], 'rushing')
-    receiving = scrape_stats([2019, 2020, 2021, 2022], 'receiving')
-    passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
+    rushing = scrape_stats([2021, 2022], 'rushing')
+    receiving = scrape_stats([2021, 2022], 'receiving')
+    #passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
     rush_rec = pd.merge(rushing, receiving, on=['Player','Tm', 'Age', 'Pos', 'G', 'GS', 'Fmb'], suffixes=["_rush","_rec"], how="outer")
 
     rush_rec['FantasyPoints'] = (

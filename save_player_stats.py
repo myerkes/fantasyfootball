@@ -15,9 +15,9 @@ BASE_URL = 'https://www.pro-football-reference.com/years/{0}/{1}.htm'
 #STAT_COL = ['passing', 'rushing', 'receiving', 'kicking']
 STAT_COL = ['passing', 'rushing', 'receiving']
 
-def create_database(table_name="",columns=[]):
+def create_database(db_name = "test_db", table_name="",columns=[]):
     # create a new database and open a connection to it
-    db_conn = sqlite3.connect('test_database4') 
+    db_conn = sqlite3.connect(db_name) 
 
     # create a database cursor in order to execute SQL statements and fetch results from SQL queries
     c = db_conn.cursor()

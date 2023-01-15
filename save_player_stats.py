@@ -32,12 +32,11 @@ def create_database(db_name = "test_db", table_name="",columns=[]):
                         
     db_conn.commit()
 
-    a = db_conn.execute('SELECT * FROM {}'.format(table_name))
-
-    names = [description[0] for description in a.description]
-    print(names)
-
     return db_conn
+
+def upload_data(df):
+
+    return True
 
 def scrape_stats(years=[2022], category=""):
 

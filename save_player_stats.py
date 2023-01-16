@@ -26,15 +26,21 @@ def create_database(db_name = "test_db", table_name="",columns=[]):
     # data type is optional
     # cur.execute("CREATE TABLE movie(title, year, score)")
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS {}({})
-        '''.format(table_name, columns))
+    sql_str = 'CREATE TABLE IF NOT EXISTS {0}({1})'.format(table_name, columns)
+
+    print(sql_str)
+
+    c.execute('''CREATE TABLE IF NOT EXISTS {0}({1})'''.format(table_name, columns))
                         
     db_conn.commit()
 
     return db_conn
 
-def upload_data(df):
+def upload_data(db_name: str, tbl_name: str, df: pd.DataFrame()):
+    # connect to a test DB with one three-column table titled "Demo"
+    cnx = sqlite3.connect(db_name)
+
+    df.to_sql(name=tbl_name, con=cnx, if_exists="replace")
 
     return True
 
@@ -117,48 +123,17 @@ def scrape_stats(years=[2022], category=""):
     return num_data
 
 def main():
-    for stat_category in STAT_COL:
+    rushing = scrape_stats([2022], 'rushing')
 
-        a = scrape_stats(2022, stat_category)
+    db_conn = create_database("db1", "rushing_receiving_stats", rushing.columns.to_list())
 
-        html = urlopen(BASE_URL.format(stat_category))
+    upload_data("db2", "rushing_receiving_stats", rushing)
+
+    test = pd.read_sql("SELECT * FROM rushing_receiving_stats WHERE Pos='TE'", db_conn)
+
+    print(test.head())
+
         
 
-        stats_page = BeautifulSoup(html, features="html.parser")
-
-        # Collect table headers
-        # receiving and kicking have extra table header row
-        if stat_category == 'passing' or stat_category == 'receiving':
-            column_headers = stats_page.findAll('tr')[0]
-            # Collect table rows
-            rows = stats_page.findAll('tr')[1:]
-        else:
-            column_headers = stats_page.findAll('tr')[1]
-            # Collect table rows
-            rows = stats_page.findAll('tr')[2:]
-
-        column_headers = [i.getText() for i in column_headers.findAll('th')]
-
-        con = create_database(stat_category, column_headers)
-
-        # Get stats from each row
-        stats = []
-        for i in range(len(rows)):
-            stats.append([col.getText() for col in rows[i].findAll('td')])
-            
-        # Create DataFrame from our scraped data
-        data = pd.DataFrame(stats, columns=column_headers[1:])
-
-        # Collect table rows
-        rows = stats_page.findAll('tr')[1:]
-        # Get stats from each row
-        stats = []
-        for i in range(len(rows)):
-            stats.append([col.getText() for col in rows[i].findAll('td')])
-
-        # Create DataFrame from our scraped data
-        data = pd.DataFrame(stats, columns=column_headers[1:])
-        
-
-if __name__ == 'main':
+if __name__ == '__main__':
     main()

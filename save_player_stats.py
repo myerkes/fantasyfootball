@@ -28,8 +28,6 @@ def create_database(db_name = "test_db", table_name="",columns=[]):
 
     sql_str = 'CREATE TABLE IF NOT EXISTS {0}({1})'.format(table_name, columns)
 
-    print(sql_str)
-
     c.execute('''CREATE TABLE IF NOT EXISTS {0}({1})'''.format(table_name, columns))
                         
     db_conn.commit()
@@ -40,7 +38,7 @@ def upload_data(db_name: str, tbl_name: str, df: pd.DataFrame()):
     # connect to a test DB with one three-column table titled "Demo"
     cnx = sqlite3.connect(db_name)
 
-    df.to_sql(name=tbl_name, con=cnx, if_exists="replace")
+    df.to_sql(name=tbl_name, con=cnx, if_exists="append")
 
     return True
 

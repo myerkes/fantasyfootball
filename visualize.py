@@ -6,49 +6,23 @@ import time
 
 from save_player_stats import *
 
+# fantasy scoring weights dictionary
+scoring_weights = {
+    'receptions': 0.5,
+    'receiving_yds': 0.1,
+    'receiving_td': 6,
+    'FL': -2,
+    'rushing_yds': 0.1,
+    'rushing_td': 6,
+    'passing_yds': 0.04,
+    'passing_td': 4,
+    'int': -2
+}
+
 
 def main():
-    sns.set_style('whitegrid')
 
-    '''
-    sns.displot(df['RushingTD'])
-    plt.show()
-    '''
-
-    # fantasy scoring weights dictionary
-    scoring_weights = {
-        'receptions': 0.5,
-        'receiving_yds': 0.1,
-        'receiving_td': 6,
-        'FL': -2,
-        'rushing_yds': 0.1,
-        'rushing_td': 6,
-        'passing_yds': 0.04,
-        'passing_td': 4,
-        'int': -2
-    }
-
-    rushing = scrape_stats([2022], 'rushing')
-    receiving = scrape_stats([2022], 'receiving')
-    #passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
-    rush_rec = pd.merge(rushing, receiving, on=['Player','Tm', 'Age', 'Pos', 'G', 'GS', 'Fmb'], suffixes=["_rush","_rec"], how="outer")
-    rush_rec['Year'] = 2022
-
-    db_conn = create_database("new_db", "rushing_receiving_stats", list(rush_rec.columns))
-
-    for year in range(2015, 2023, 1):
-        rushing = scrape_stats([year], 'rushing')
-        receiving = scrape_stats([year], 'receiving')
-        #passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
-        rush_rec = pd.merge(rushing, receiving, on=['Player','Tm', 'Age', 'Pos', 'G', 'GS', 'Fmb'], suffixes=["_rush","_rec"], how="outer")
-        rush_rec['Year'] = year
-
-        upload_data("new_db", "rushing_receiving_stats", rush_rec)
-
-        print("Uploading {}...".format(year))
-
-        time.sleep(5)
-
+    db_conn = sqlite3.connect('new_db')
     rush_rec = pd.read_sql_query('SELECT * FROM rushing_receiving_stats', db_conn)
     
     rush_rec['FantasyPoints'] = (

@@ -27,6 +27,18 @@ def main():
         'int': -2
     }
 
+    rushing = scrape_stats([2022], 'rushing')
+
+    db_conn = create_database("db1", "rushing_receiving_stats", list(rushing.columns))
+    
+    upload_data("db1", "rushing_receiving_stats", rushing)
+
+    test = pd.read_sql_query('SELECT * FROM rushing_receiving_stats', db_conn)
+
+    print(test.head())
+
+    quit()
+
     rushing = scrape_stats([2021, 2022], 'rushing')
     receiving = scrape_stats([2021, 2022], 'receiving')
     #passing = scrape_stats([2019, 2020, 2021, 2022], 'passing')
